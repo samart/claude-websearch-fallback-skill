@@ -1,0 +1,16 @@
+{
+  "chrome": {
+    "profile_path": "auto",
+    "headless": false,
+    "timeout_seconds": 30,
+    "wait_for_js_seconds": 2
+  },
+  "search": {
+    "default_engine": "google",
+    "max_results": 10
+  },
+  "fetch": {
+    "max_content_length": 50000,
+    "extract_main_content": true
+  }
+}
