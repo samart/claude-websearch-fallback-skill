@@ -17,7 +17,7 @@ This skill controls your local Chrome browser, which inherits your:
 ## Installation
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/websearch-fallback.git .claude/skills/websearch-fallback
+git clone https://github.com/samart/websearch-fallback.git .claude/skills/websearch-fallback
 pip install -r .claude/skills/websearch-fallback/requirements.txt
 ```
 
