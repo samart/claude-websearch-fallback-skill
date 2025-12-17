@@ -26,15 +26,15 @@ pip install -r .claude/skills/websearch-fallback/requirements.txt
 ### Fetch a URL
 
 ```bash
-# Default (selenium backend)
+# Default (zendriver backend - better anti-bot bypass)
 python .claude/skills/websearch-fallback/fetch.py --url "URL_HERE" --headless
 
-# Zendriver backend (better anti-bot bypass)
-python .claude/skills/websearch-fallback/fetch.py --url "URL_HERE" --headless --backend zendriver
+# Selenium backend (legacy)
+python .claude/skills/websearch-fallback/fetch.py --url "URL_HERE" --headless --backend selenium
 ```
 
 Options:
-- `--backend zendriver|selenium` - Backend to use (default: selenium)
+- `--backend zendriver|selenium` - Backend to use (default: zendriver)
 - `--headless` - Run without visible browser window (recommended)
 - `--timeout 30` - Page load timeout in seconds
 - `--wait 2.0` - Seconds to wait for JavaScript to render
@@ -42,27 +42,27 @@ Options:
 ### Search the Web
 
 ```bash
-# Default (selenium backend)
+# Default (zendriver backend - better anti-bot bypass)
 python .claude/skills/websearch-fallback/search.py --query "SEARCH_QUERY" --headless
 
-# Zendriver backend (better anti-bot bypass)
-python .claude/skills/websearch-fallback/search.py --query "SEARCH_QUERY" --headless --backend zendriver
+# Selenium backend (legacy)
+python .claude/skills/websearch-fallback/search.py --query "SEARCH_QUERY" --headless --backend selenium
 ```
 
 Options:
-- `--backend zendriver|selenium` - Backend to use (default: selenium)
+- `--backend zendriver|selenium` - Backend to use (default: zendriver)
 - `--engine google|bing|duckduckgo` - Search engine (default: bing)
 - `--max-results 10` - Maximum results to return
 - `--headless` - Run without visible browser window (recommended)
 
-## When to Use Zendriver
+## When to Use Selenium
 
-Use `--backend zendriver` when:
-- Sites block automated requests
-- You encounter CAPTCHAs frequently
-- Standard selenium backend fails
+Use `--backend selenium` when:
+- Zendriver has compatibility issues
+- You need DuckDuckGo search (auto-fallback)
+- Legacy compatibility is required
 
-Zendriver bypasses more anti-bot systems by communicating directly with Chrome via DevTools Protocol instead of WebDriver.
+Zendriver (default) bypasses more anti-bot systems by communicating directly with Chrome via DevTools Protocol instead of WebDriver.
 
 ## Output Format
 

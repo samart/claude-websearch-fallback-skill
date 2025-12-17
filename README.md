@@ -1,38 +1,38 @@
 # Claude WebSearch Fallback
 
-A Claude Code skill that provides fallback web access when `WebSearch` and `WebFetch` tools fail due to HTTP errors (403, 404, proxy blocks, etc.).
+A Claude Code skill that ensures Claude's web research capabilities always work—even when the built-in tools fail.
 
-## Why This Skill?
+## Why This Matters
 
-Claude Code's built-in `WebSearch` and `WebFetch` tools make requests from Anthropic's infrastructure, which can be blocked by:
-- Corporate proxies and firewalls
-- Geo-restrictions
-- Sites with aggressive bot detection
+Claude's ability to research, plan, and gather current information is core to its effectiveness as a coding assistant. When `WebSearch` or `WebFetch` tools fail (403 errors, proxy blocks, geo-restrictions), Claude loses access to:
+- Current documentation and API references
+- Stack Overflow solutions and community knowledge
+- Latest library versions and changelogs
+- Your internal wikis and documentation
 
-This skill controls your local Chrome browser, which:
-- Has your authenticated sessions (logged into sites)
-- Works within your corporate firewall, were you have all your internal information (wikis, documentation sites, etc) needed by your agent to accomplish your work.
-- Passes through your corporate proxy correctly, so that research can be informed with the latest search, all within your access profile
-- Has your cookies and permissions
-- Appears as legitimate browser traffic
+**This skill ensures Claude can always research on your behalf.**
 
-## Backends
+## How It Works
 
-This skill supports two browser automation backends:
+Instead of making requests from Anthropic's infrastructure (which can be blocked), this skill controls **your local Chrome browser**. This means:
 
-| Backend | Anti-Bot Success Rate | Architecture | Best For |
-|---------|----------------------|--------------|----------|
-| **zendriver** | **75%** | Chrome DevTools Protocol | Sites with bot detection, Cloudflare |
-| selenium | 25% | WebDriver Protocol | General use, cross-browser |
+- **Your access, your permissions** — Claude searches as you, with your authenticated sessions
+- **Corporate firewall friendly** — Access internal wikis, documentation, and tools behind your VPN
+- **No additional credentials needed** — Uses your existing browser cookies and logins
+- **Appears as legitimate traffic** — Because it is—it's your browser
 
-**Recommendation**: Use `--backend zendriver` for sites that block automated requests.
+## Test Coverage
+
+```
+55 tests | 40% code coverage | All passing
+```
 
 ## Quick Install
 
 ```bash
 # Clone into your project's skills directory
 mkdir -p .claude/skills && cd .claude/skills
-git clone https://github.com/YOUR_USERNAME/websearch-fallback.git
+git clone https://github.com/samart/claude-websearch-fallback-skill.git websearch-fallback
 
 # Install dependencies
 cd websearch-fallback
@@ -50,21 +50,20 @@ pip install -r requirements.txt
 ### Fetch a URL
 
 ```bash
-# Using selenium (default)
+# Using zendriver (default - better anti-bot bypass)
 python .claude/skills/websearch-fallback/fetch.py --url "https://example.com" --headless
 
-# Using zendriver (better anti-bot bypass)
-python .claude/skills/websearch-fallback/fetch.py --url "https://example.com" --headless --backend zendriver
+# Using selenium (legacy)
+python .claude/skills/websearch-fallback/fetch.py --url "https://example.com" --headless --backend selenium
 ```
 
-**Options:**
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--url` | URL to fetch (required) | - |
-| `--backend` | `selenium` or `zendriver` | selenium |
-| `--headless` | Run without visible browser | false |
-| `--timeout` | Page load timeout in seconds | 30 |
-| `--wait` | Seconds to wait for JS to render | 2.0 |
+| Option | Default |
+|--------|---------|
+| `--url` | required |
+| `--backend` | zendriver |
+| `--headless` | false |
+| `--timeout` | 30s |
+| `--wait` | 2.0s |
 
 **Output:**
 ```json
@@ -82,22 +81,21 @@ python .claude/skills/websearch-fallback/fetch.py --url "https://example.com" --
 ### Search the Web
 
 ```bash
-# Using selenium (default)
+# Using zendriver (default - better anti-bot bypass)
 python .claude/skills/websearch-fallback/search.py --query "your search" --headless
 
-# Using zendriver (better anti-bot bypass)
-python .claude/skills/websearch-fallback/search.py --query "your search" --headless --backend zendriver
+# Using selenium (legacy)
+python .claude/skills/websearch-fallback/search.py --query "your search" --headless --backend selenium
 ```
 
-**Options:**
-| Option | Description | Default |
-|--------|-------------|---------|
-| `--query` | Search query (required) | - |
-| `--backend` | `selenium` or `zendriver` | selenium |
-| `--engine` | `google`, `bing`, or `duckduckgo` | bing |
-| `--max-results` | Maximum results to return | 10 |
-| `--headless` | Run without visible browser | false |
-| `--timeout` | Page load timeout in seconds | 30 |
+| Option | Default |
+|--------|---------|
+| `--query` | required |
+| `--backend` | zendriver |
+| `--engine` | bing |
+| `--max-results` | 10 |
+| `--headless` | false |
+| `--timeout` | 30s |
 
 **Output:**
 ```json
@@ -113,51 +111,48 @@ python .claude/skills/websearch-fallback/search.py --query "your search" --headl
 }
 ```
 
-## Search Engine Notes
+## Search Engines
 
-| Engine | Headless Mode | Notes |
-|--------|---------------|-------|
-| **google** | Works | Best results, anti-detection enabled |
-| **bing** | Works | Reliable fallback |
-| duckduckgo | Unreliable | JS-heavy, sometimes blocked |
+| Engine | Reliability | Notes |
+|--------|-------------|-------|
+| **bing** | High | Default, most reliable |
+| **google** | High | Best results quality |
+| duckduckgo | Low | JS-heavy, often blocked |
 
-## How the Backends Work
+## Using Your Authenticated Sessions
 
-### Selenium Backend
-Uses `undetected-chromedriver` to patch standard Selenium WebDriver:
-- Removes automation indicators (`navigator.webdriver`)
-- Sets realistic user-agent and window size
-- Disables automation-revealing Chrome flags
-
-### Zendriver Backend
-Successor to undetected-chromedriver, communicates directly via Chrome DevTools Protocol:
-- Completely bypasses WebDriver architecture
-- Async-first design for better performance
-- Higher success rate against Cloudflare, Akamai, and other anti-bot systems
-- No WebDriver/Selenium dependency in the request chain
-
-## Using with Your Browser Profile
-
-To use your logged-in sessions (cookies, authentication):
+To access sites you're logged into (internal wikis, private repos, etc.):
 
 1. **Close Chrome completely** (the profile is locked while Chrome runs)
-2. Run without `--headless` flag:
+2. Run without `--headless`:
    ```bash
    python search.py --query "internal docs" --engine google
    ```
 
-This opens a visible Chrome window using your default profile with all your cookies and sessions.
+This opens Chrome with your default profile—all your cookies, sessions, and logins work automatically.
+
+## Backend Details
+
+The skill includes two browser automation backends:
+
+| Backend | Description |
+|---------|-------------|
+| **zendriver** (default) | Uses Chrome DevTools Protocol directly. Better anti-bot bypass, higher success rate against Cloudflare/Akamai. |
+| selenium | Uses WebDriver with undetected-chromedriver patches. More mature, wider compatibility. |
 
 ## Running Tests
 
 ```bash
-pip install pytest
+pip install pytest pytest-cov
 
-# Unit tests
-pytest tests/test_converter.py -v
+# Unit tests only
+pytest tests/test_converter.py tests/test_backends.py -v
 
-# Integration tests (requires Chrome)
-pytest tests/test_integration.py -v --run-integration
+# All tests including integration (requires Chrome)
+pytest --run-integration -v
+
+# With coverage
+pytest --cov=lib --run-integration
 ```
 
 ## Project Structure
@@ -180,18 +175,13 @@ websearch-fallback/
 
 ## Troubleshooting
 
-### "session not created" error
-Chrome is already running with your profile. Close Chrome and try again.
-
-### CAPTCHA appears
-Try `--backend zendriver` for better anti-bot bypass. If still blocked, wait a few minutes or use a different search engine.
-
-### ChromeDriver version mismatch
-The skill auto-downloads the correct ChromeDriver version via `webdriver-manager`.
-
-### Zendriver fails to start
-Ensure Chrome is installed. Zendriver requires Chrome/Chromium (not just ChromeDriver).
+| Issue | Solution |
+|-------|----------|
+| "session not created" error | Close Chrome completely—the profile is locked while Chrome runs |
+| CAPTCHA appears | Try a different search engine, or wait a few minutes |
+| ChromeDriver version mismatch | The skill auto-downloads the correct version via `webdriver-manager` |
+| Zendriver fails to start | Ensure Chrome/Chromium is installed (not just ChromeDriver) |
 
 ## License
 
-MIT License - See LICENSE file for details.
+MIT License

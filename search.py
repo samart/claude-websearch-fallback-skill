@@ -50,8 +50,8 @@ def search_with_zendriver(query: str, engine: str, max_results: int, headless: b
 def main():
     parser = argparse.ArgumentParser(description="Web search via browser automation")
     parser.add_argument("--query", required=True, help="Search query")
-    parser.add_argument("--backend", choices=BACKENDS, default="selenium",
-                        help="Backend to use (default: selenium)")
+    parser.add_argument("--backend", choices=BACKENDS, default="zendriver",
+                        help="Backend to use (default: zendriver)")
     parser.add_argument("--engine", choices=ENGINES, default="bing",
                         help="Search engine (default: bing)")
     parser.add_argument("--max-results", type=int, default=10, help="Max results")

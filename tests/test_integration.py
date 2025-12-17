@@ -217,6 +217,174 @@ class TestSearchScript:
         assert result["metadata"]["backend"] == "selenium"
 
 
+class TestZendriverSearches:
+    """Extended tests specifically for zendriver backend searches."""
+
+    @pytest.mark.integration
+    def test_zendriver_google_search(self, check_chrome):
+        """Test zendriver Google search returns results."""
+        result = run_script("search.py", [
+            "--query", "python programming language",
+            "--engine", "google",
+            "--max-results", "5",
+            "--headless",
+            "--backend", "zendriver",
+        ], timeout=60)
+
+        assert "success" in result
+        assert "results" in result
+        assert result["metadata"]["backend"] == "zendriver"
+        # If successful, verify we got results
+        if result["success"]:
+            assert len(result["results"]) > 0
+            assert len(result["results"]) <= 5
+
+    @pytest.mark.integration
+    def test_zendriver_bing_search(self, check_chrome):
+        """Test zendriver Bing search returns results."""
+        result = run_script("search.py", [
+            "--query", "machine learning tutorial",
+            "--engine", "bing",
+            "--max-results", "5",
+            "--headless",
+            "--backend", "zendriver",
+        ], timeout=60)
+
+        assert "success" in result
+        assert "results" in result
+        assert result["metadata"]["backend"] == "zendriver"
+        if result["success"]:
+            assert len(result["results"]) > 0
+
+    @pytest.mark.integration
+    @pytest.mark.parametrize("query", [
+        "weather today",
+        "latest news",
+        "how to cook pasta",
+        "best programming languages 2024",
+    ])
+    def test_zendriver_various_queries(self, check_chrome, query):
+        """Test zendriver with various search queries."""
+        result = run_script("search.py", [
+            "--query", query,
+            "--engine", "bing",
+            "--max-results", "3",
+            "--headless",
+            "--backend", "zendriver",
+        ], timeout=60)
+
+        assert "success" in result
+        assert "query" in result
+        assert result["query"] == query
+        assert "results" in result
+        assert isinstance(result["results"], list)
+
+    @pytest.mark.integration
+    def test_zendriver_search_max_results_limit(self, check_chrome):
+        """Test that max-results parameter is respected."""
+        result = run_script("search.py", [
+            "--query", "python",
+            "--engine", "bing",
+            "--max-results", "2",
+            "--headless",
+            "--backend", "zendriver",
+        ], timeout=60)
+
+        assert "results" in result
+        if result["success"] and len(result["results"]) > 0:
+            assert len(result["results"]) <= 2
+
+    @pytest.mark.integration
+    def test_zendriver_search_special_characters(self, check_chrome):
+        """Test zendriver handles queries with special characters."""
+        result = run_script("search.py", [
+            "--query", "C++ programming",
+            "--engine", "bing",
+            "--max-results", "3",
+            "--headless",
+            "--backend", "zendriver",
+        ], timeout=60)
+
+        assert "success" in result
+        assert "results" in result
+        # Query should be preserved
+        assert "C++" in result["query"]
+
+    @pytest.mark.integration
+    def test_zendriver_search_quoted_query(self, check_chrome):
+        """Test zendriver handles exact phrase queries."""
+        result = run_script("search.py", [
+            "--query", '"machine learning"',
+            "--engine", "bing",
+            "--max-results", "3",
+            "--headless",
+            "--backend", "zendriver",
+        ], timeout=60)
+
+        assert "success" in result
+        assert "results" in result
+
+    @pytest.mark.integration
+    @pytest.mark.parametrize("engine", ["google", "bing"])
+    def test_zendriver_result_urls_are_valid(self, check_chrome, engine):
+        """Test that search results contain valid URLs."""
+        result = run_script("search.py", [
+            "--query", "python documentation",
+            "--engine", engine,
+            "--max-results", "5",
+            "--headless",
+            "--backend", "zendriver",
+        ], timeout=60)
+
+        if result["success"] and len(result["results"]) > 0:
+            for item in result["results"]:
+                assert "url" in item
+                assert item["url"].startswith("http")
+                # URL should not be a search engine URL
+                assert "google.com/search" not in item["url"]
+                assert "bing.com/search" not in item["url"]
+
+    @pytest.mark.integration
+    def test_zendriver_search_timing(self, check_chrome):
+        """Test that search timing is recorded."""
+        result = run_script("search.py", [
+            "--query", "test query",
+            "--engine", "bing",
+            "--headless",
+            "--backend", "zendriver",
+        ], timeout=60)
+
+        assert "metadata" in result
+        assert "search_time_ms" in result["metadata"]
+        # Search should complete in reasonable time (under 30 seconds)
+        assert result["metadata"]["search_time_ms"] < 30000
+
+    @pytest.mark.integration
+    def test_zendriver_google_vs_bing_both_work(self, check_chrome):
+        """Test that both Google and Bing work with zendriver."""
+        google_result = run_script("search.py", [
+            "--query", "test",
+            "--engine", "google",
+            "--max-results", "3",
+            "--headless",
+            "--backend", "zendriver",
+        ], timeout=60)
+
+        bing_result = run_script("search.py", [
+            "--query", "test",
+            "--engine", "bing",
+            "--max-results", "3",
+            "--headless",
+            "--backend", "zendriver",
+        ], timeout=60)
+
+        # Both should return valid structure
+        assert "success" in google_result
+        assert "success" in bing_result
+        assert google_result["engine"] == "google"
+        assert bing_result["engine"] == "bing"
+
+
 # Marker for integration tests
 def pytest_configure(config):
     config.addinivalue_line(

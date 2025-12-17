@@ -36,8 +36,8 @@ def get_backend(name: str):
 def main():
     parser = argparse.ArgumentParser(description="Fetch URL via browser automation")
     parser.add_argument("--url", required=True, help="URL to fetch")
-    parser.add_argument("--backend", choices=list(BACKENDS.keys()), default="selenium",
-                        help="Backend to use (default: selenium)")
+    parser.add_argument("--backend", choices=list(BACKENDS.keys()), default="zendriver",
+                        help="Backend to use (default: zendriver)")
     parser.add_argument("--headless", action="store_true", help="Run headless")
     parser.add_argument("--timeout", type=int, default=30, help="Timeout seconds")
     parser.add_argument("--wait", type=float, default=2.0, help="JS wait seconds")
