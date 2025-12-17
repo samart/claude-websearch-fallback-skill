@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <!-- Gradients for 3D depth -->
+    <radialGradient id="canopyGrad" cx="50%" cy="30%" r="80%" fx="50%" fy="20%">
+      <stop offset="0%" style="stop-color:#ff9e80;stop-opacity:1" /> <!-- Highlight -->
+      <stop offset="60%" style="stop-color:#da7756;stop-opacity:1" /> <!-- Main Color -->
+      <stop offset="100%" style="stop-color:#bf5e3d;stop-opacity:1" /> <!-- Shadow -->
+    </radialGradient>
+    
+    <linearGradient id="rimGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#555555;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#333333;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#111111;stop-opacity:1" />
+    </linearGradient>
+
+    <radialGradient id="glassGrad" cx="30%" cy="30%" r="90%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.6" />
+      <stop offset="40%" style="stop-color:#e0f7fa;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#81d4fa;stop-opacity:0.1" />
+    </radialGradient>
+    
+    <!-- Drop Shadows -->
+    <filter id="floatShadow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="15"/>
+      <feOffset dx="0" dy="20" result="offsetblur"/>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.3"/>
+      </feComponentTransfer>
+      <feMerge> 
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/> 
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background Circle (Soft vignette) -->
+  <circle cx="256" cy="256" r="256" fill="#fcfcfc" />
+
+  <g transform="translate(0, -20)"> <!-- Lift slightly -->
+      
+    <!-- Ropes (behind) -->
+    <line x1="256" y1="180" x2="200" y2="300" stroke="#888" stroke-width="4" />
+    <line x1="256" y1="180" x2="312" y2="300" stroke="#888" stroke-width="4" />
+
+    <!-- Parachute Canopy (3D Dome) -->
+    <path d="M 128 200 C 128 100 192 60 256 60 C 320 60 384 100 384 200 C 384 220 370 230 356 210 C 330 180 300 170 256 170 C 212 170 182 180 156 210 C 142 230 128 220 128 200 Z" 
+          fill="url(#canopyGrad)" filter="url(#floatShadow)" />
+
+    <!-- Segments detail on parachute -->
+    <path d="M 256 60 C 256 60 256 120 256 170" stroke="#bf5e3d" stroke-width="2" fill="none" opacity="0.5"/>
+    <path d="M 256 60 C 256 60 310 90 335 185" stroke="#bf5e3d" stroke-width="2" fill="none" opacity="0.4"/>
+    <path d="M 256 60 C 256 60 202 90 177 185" stroke="#bf5e3d" stroke-width="2" fill="none" opacity="0.4"/>
+
+    <!-- Magnifying Glass (Suspended Payload) -->
+    <g transform="translate(256, 320) rotate(-15)">
+      <!-- Shadow of glass -->
+      <ellipse cx="20" cy="80" rx="60" ry="15" fill="#000" opacity="0.15" filter="url(#alpha-blur)" />
+
+      <!-- Handle (3D Cylinder) -->
+      <path d="M 35 35 L 75 75 A 10 10 0 0 1 60 90 L 20 50 Z" fill="#333" />
+      <path d="M 25 55 L 65 95" stroke="#555" stroke-width="2" opacity="0.5" /> <!-- Detail line -->
+
+      <!-- Rim (3D Ring) -->
+      <circle cx="0" cy="0" r="64" fill="url(#rimGrad)" />
+      <circle cx="0" cy="0" r="52" fill="#fff" />
+      
+      <!-- Glass Lens -->
+      <circle cx="0" cy="0" r="52" fill="url(#glassGrad)" />
+      
+      <!-- Lens Reflection/Gloss -->
+      <path d="M -30 -30 Q -10 -50 20 -35" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity="0.8" />
+      <circle cx="15" cy="15" r="5" fill="#fff" opacity="0.4" />
+      
+      <!-- "Net" pattern inside glass (simulating the 'fallback') -->
+      <path d="M -40 0 H 40 M 0 -40 V 40 M -28 -28 L 28 28 M -28 28 L 28 -28" 
+            stroke="#da7756" stroke-width="2" opacity="0.15" />
+    </g>
+  </g>
+  
+</svg>

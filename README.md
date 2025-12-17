@@ -1,3 +1,5 @@
+<img src="logo.svg" align="right" width="200" height="200" alt="Claude WebSearch Fallback Logo">
+
 # Claude WebSearch Fallback
 
 A Claude Code skill that ensures Claude's web research capabilities always workâ€”even when the built-in tools fail.
@@ -5,6 +7,7 @@ A Claude Code skill that ensures Claude's web research capabilities always workâ
 ## Why This Matters
 
 Claude's ability to research, plan, and gather current information is core to its effectiveness as a coding assistant. When `WebSearch` or `WebFetch` tools fail (403 errors, proxy blocks, geo-restrictions), Claude loses access to:
+
 - Current documentation and API references
 - Stack Overflow solutions and community knowledge
 - Latest library versions and changelogs
@@ -66,6 +69,7 @@ python .claude/skills/websearch-fallback/fetch.py --url "https://example.com" --
 | `--wait` | 2.0s |
 
 **Output:**
+
 ```json
 {
   "success": true,
@@ -98,6 +102,7 @@ python .claude/skills/websearch-fallback/search.py --query "your search" --headl
 | `--timeout` | 30s |
 
 **Output:**
+
 ```json
 {
   "success": true,
@@ -125,6 +130,7 @@ To access sites you're logged into (internal wikis, private repos, etc.):
 
 1. **Close Chrome completely** (the profile is locked while Chrome runs)
 2. Run without `--headless`:
+
    ```bash
    python search.py --query "internal docs" --engine google
    ```
