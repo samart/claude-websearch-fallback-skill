@@ -1,4 +1,4 @@
-yes,---
+---
 name: websearch-fallback
 description: Fetches web pages and performs web searches using local Chrome browser. Use when WebSearch or WebFetch tools fail with HTTP errors (403, 404, proxy blocks), when accessing sites behind corporate firewalls, or when the user needs to search using their authenticated browser sessions.
 ---
